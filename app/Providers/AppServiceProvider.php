@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Policies\PeminjamanPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // [Modul 7] Di Vercel, HTTPS dihentikan di lapisan depan sehingga Laravel mengira diakses lewat HTTP.
+        // Paksa semua URL (url(), route(), asset()) memakai https agar CSS/JS tidak diblokir (mixed content).
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Peminjaman::class, PeminjamanPolicy::class);
 
