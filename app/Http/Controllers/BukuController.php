@@ -23,9 +23,11 @@ class BukuController extends Controller
         $query = Buku::with('kategori');
 
         if ($request->filled('q')) {
-            $q = $request->q;
+            // LOWER() dipakai agar pencarian tidak peduli huruf besar/kecil di semua database
+            // (LIKE di PostgreSQL/Supabase membedakan huruf besar-kecil, di MySQL tidak).
+            $q = '%'.mb_strtolower($request->q).'%';
             $query->where(function ($w) use ($q) {
-                $w->where('judul', 'like', "%{$q}%")->orWhere('penulis', 'like', "%{$q}%");
+                $w->whereRaw('LOWER(judul) LIKE ?', [$q])->orWhereRaw('LOWER(penulis) LIKE ?', [$q]);
             });
         }
 

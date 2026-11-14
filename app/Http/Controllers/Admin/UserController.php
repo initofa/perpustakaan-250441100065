@@ -17,8 +17,8 @@ class UserController extends Controller
         $query = User::with('roles')->orderBy('name');
 
         if ($request->filled('q')) {
-            $q = $request->q;
-            $query->where(fn ($w) => $w->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%"));
+            $q = '%'.mb_strtolower($request->q).'%';
+            $query->where(fn ($w) => $w->whereRaw('LOWER(name) LIKE ?', [$q])->orWhereRaw('LOWER(email) LIKE ?', [$q]));
         }
 
         return view('admin.users.index', [
